@@ -513,11 +513,31 @@ describe('webContents module', () => {
     })
   })
 
-  it('supports inserting CSS', async () => {
-    w.loadURL('about:blank')
-    w.webContents.insertCSS('body { background-repeat: round; }')
-    const result = await w.webContents.executeJavaScript('window.getComputedStyle(document.body).getPropertyValue("background-repeat")')
-    expect(result).to.equal('round')
+  describe('insertCSS', () => {
+    it('supports inserting CSS', async () => {
+      w.loadURL('about:blank')
+      await w.webContents.insertCSS('body { background-repeat: round; }')
+      const result = await w.webContents.executeJavaScript('window.getComputedStyle(document.body).getPropertyValue("background-repeat")')
+      expect(result).to.equal('round')
+    })
+  })
+
+  describe('removeInsertedCSS', () => {
+    it('supports removing inserted CSS', async () => {
+      w.loadURL('about:blank')
+      const key = await w.webContents.insertCSS('body { background-repeat: round; }')
+      let result = await w.webContents.executeJavaScript('window.getComputedStyle(document.body).getPropertyValue("background-repeat")')
+      expect(result).to.equal('round')
+
+      await w.webContents.removeInsertedCSS(key)
+      result = await w.webContents.executeJavaScript('window.getComputedStyle(document.body).getPropertyValue("background-repeat")')
+      expect(result).to.equal('repeat')
+    })
+
+    it('removing inserted CSS fails if key is invalid', async () => {
+      w.loadURL('about:blank')
+      await expect(() => w.webContents.removeInsertedCSS(0)).to.eventually.be.rejected
+    })
   })
 
   it('supports inspecting an element in the devtools', (done) => {

@@ -1010,6 +1010,33 @@ describe('<webview> tag', function () {
     })
   })
 
+  describe('insertCSS', () => {
+    it('supports inserting CSS', async () => {
+      await loadWebView(webview, { src: `file://${fixtures}/pages/base-page.html` })
+      await webview.insertCSS('body { background-repeat: round; }')
+      const result = await webview.executeJavaScript('window.getComputedStyle(document.body).getPropertyValue("background-repeat")')
+      expect(result).to.equal('round')
+    })
+  })
+
+  describe('removeInsertedCSS', () => {
+    it('supports removing inserted CSS', async () => {
+      await loadWebView(webview, { src: `file://${fixtures}/pages/base-page.html` })
+      const key = await webview.insertCSS('body { background-repeat: round; }')
+      let result = await webview.executeJavaScript('window.getComputedStyle(document.body).getPropertyValue("background-repeat")')
+      expect(result).to.equal('round')
+
+      await webview.removeInsertedCSS(key)
+      result = await webview.executeJavaScript('window.getComputedStyle(document.body).getPropertyValue("background-repeat")')
+      expect(result).to.equal('repeat')
+    })
+
+    it('removing inserted CSS fails if key is invalid', async () => {
+      await loadWebView(webview, { src: `file://${fixtures}/pages/base-page.html` })
+      await expect(() => webview.removeInsertedCSS(0)).to.eventually.be.rejected
+    })
+  })
+
   describe('sendInputEvent', () => {
     it('can send keyboard event', async () => {
       loadWebView(webview, {
