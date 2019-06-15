@@ -1,7 +1,5 @@
-'use strict'
-
 // Public-facing API methods.
-exports.syncMethods = new Set([
+export const syncMethods = new Set([
   'getURL',
   'loadURL',
   'getTitle',
@@ -53,7 +51,7 @@ exports.syncMethods = new Set([
   'setZoomLevel'
 ])
 
-exports.asyncMethods = new Set([
+export const asyncMethods = new Set([
   'capturePage',
   'executeJavaScript',
   'insertCSS',
